@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BehaViewer</title>
+
+    <script>
+      // Variables to store IP address and ISP
+      let userIpAddress;
+      let userIsp;
+
+      // Fetching the user's IP information
+      fetch("http://ip-api.com/json")
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Storing the fetched data into variables
+          userIpAddress = data.query;
+          userIsp = data.isp;
+
+          console.log("Stored IP Address:", userIpAddress);
+          console.log("Stored ISP:", userIsp);
+
+          // Send GET request to Flask API with ISP
+          fetch(`http://localhost:5000/api/ISP?ISP=${encodeURIComponent(userIsp)}`)
+            .then(response => response.json())
+            .then(apiResponse => {
+              console.log("Response from Flask API:", apiResponse);
+            })
+            .catch(error => {
+              console.error("Error sending ISP to Flask API:", error);
+            });
+        })
+        .catch(error => {
+          console.error("There was a problem with the fetch operation:", error);
+        });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
